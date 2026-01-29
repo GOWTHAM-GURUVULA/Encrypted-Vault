@@ -1,0 +1,112 @@
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #0b0f14;
+  color: #e6e6e6;
+}
+
+.screen {
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card {
+  background: #121821;
+  padding: 32px;
+  border-radius: 14px;
+  width: 340px;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.card h1 {
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: none;
+  background: #1b2230;
+  color: #fff;
+}
+
+button {
+  background: #3b82f6;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button.danger {
+  background: #ef4444;
+}
+
+.error {
+  color: #ff6b6b;
+  margin-top: 10px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.toolbar {
+  margin-bottom: 16px;
+}
+
+.file-btn {
+  background: #22c55e;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.file-list {
+  display: grid;
+  gap: 12px;
+}
+
+.file-card {
+  background: #121821;
+  padding: 14px 16px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.actions button {
+  margin-left: 8px;
+}
+
+.muted {
+  color: #8b95a5;
+}
+body {
+  margin: 0;
+  background-color: #121212;
+  font-family: Arial, Helvetica, sans-serif;
+}
