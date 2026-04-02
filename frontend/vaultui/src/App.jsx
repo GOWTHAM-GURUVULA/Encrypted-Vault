@@ -1,31 +1,165 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import vault from "./assets/vault.png";
+import vaultImg from "./assets/vault.svg";
+import {
+  closeVault,
+  generateRecoveryKey,
+  getFiles,
+  getRecoveryStatus,
+  openVault,
+  openVaultWithRecoveryKey,
+  removeFile,
+  restoreFile,
+  setVaultPassword,
+  uploadFile,
+} from "./api/vaultApi";
 
-const API = "http://127.0.0.1:8000";
+const PROMO_FEED_URL = import.meta.env.VITE_PROMO_FEED_URL || "";
+
+function inferCategory(filename) {
+  const extension = filename.split(".").pop()?.toLowerCase() || "";
+
+  if (["png", "jpg", "jpeg", "gif", "bmp", "webp", "svg"].includes(extension)) {
+    return "Images";
+  }
+  if (["pdf", "doc", "docx", "txt", "ppt", "pptx", "xls", "xlsx"].includes(extension)) {
+    return "Documents";
+  }
+  if (["py", "js", "jsx", "ts", "tsx", "java", "c", "cpp", "html", "css", "json"].includes(extension)) {
+    return "Projects";
+  }
+  if (["csv", "bank", "invoice"].includes(extension)) {
+    return "Finance";
+  }
+
+  return "Personal";
+}
 
 export default function App() {
-  const [password, setPassword] = useState("");
+  const [secret, setSecret] = useState("");
+  const [loginMode, setLoginMode] = useState("password");
   const [unlocked, setUnlocked] = useState(false);
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [recoveryStatus, setRecoveryStatus] = useState({ configured: false, pending: false });
+  const [recoveryKey, setRecoveryKey] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+  const [groupByCategory, setGroupByCategory] = useState(false);
+  const [activeView, setActiveView] = useState("overview");
+  const [openedCategory, setOpenedCategory] = useState("");
+  const [copiedRecovery, setCopiedRecovery] = useState(false);
+  const [isOnline, setIsOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
+  const [promos, setPromos] = useState([]);
+
+  async function refreshFiles() {
+    const data = await getFiles();
+    setFiles(data);
+  }
+
+  async function refreshRecoveryStatus() {
+    const data = await getRecoveryStatus();
+    setRecoveryStatus(data);
+  }
 
   useEffect(() => {
-    if (unlocked) loadFiles();
+    if (unlocked) {
+      loadVaultData();
+    }
   }, [unlocked]);
+
+  useEffect(() => {
+    function handleOnline() {
+      setIsOnline(true);
+    }
+
+    function handleOffline() {
+      setIsOnline(false);
+    }
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadPromos() {
+      if (!unlocked || !isOnline) {
+        setPromos([]);
+        return;
+      }
+
+      if (!PROMO_FEED_URL) {
+        setPromos([]);
+        return;
+      }
+
+      try {
+        const res = await fetch(PROMO_FEED_URL, {
+          cache: "no-store",
+        });
+
+        if (!res.ok) {
+          throw new Error("Promo feed unavailable");
+        }
+
+        const data = await res.json();
+        if (!cancelled) {
+          setPromos(Array.isArray(data?.items) ? data.items : []);
+        }
+      } catch {
+        if (!cancelled) {
+          setPromos([]);
+        }
+      }
+    }
+
+    loadPromos();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [unlocked, isOnline]);
+
+  useEffect(() => {
+    function preventWindowDrop(event) {
+      event.preventDefault();
+    }
+
+    window.addEventListener("dragover", preventWindowDrop);
+    window.addEventListener("drop", preventWindowDrop);
+
+    return () => {
+      window.removeEventListener("dragover", preventWindowDrop);
+      window.removeEventListener("drop", preventWindowDrop);
+    };
+  }, []);
+
+  async function loadVaultData() {
+    try {
+      await Promise.all([refreshFiles(), refreshRecoveryStatus()]);
+    } catch (e) {
+      setError(e.message);
+      console.error("Failed to fetch vault data", e);
+    }
+  }
 
   async function unlockVault() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch(`${API}/vault/open`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-
-      if (!res.ok) throw new Error("Invalid password");
+      if (loginMode === "recovery") {
+        await openVaultWithRecoveryKey(secret);
+      } else {
+        await openVault(secret);
+      }
       setUnlocked(true);
     } catch (e) {
       setError(e.message);
@@ -34,104 +168,492 @@ export default function App() {
     }
   }
 
-  async function loadFiles() {
-    const res = await fetch(`${API}/vault/files`);
-    const data = await res.json();
-    setFiles(data.files || []);
+  async function uploadSelectedPath(path) {
+    try {
+      setError("");
+      await uploadFile(path);
+      await refreshFiles();
+    } catch (e) {
+      setError(e.message);
+    }
   }
 
-  async function addFile(e) {
-    const file = e.target.files[0];
-    if (!file) return;
+  async function handleAddFile() {
+    const path = await window.electronAPI.selectFile();
+    if (!path) return;
 
-    const form = new FormData();
-    form.append("file", file);
-
-    await fetch(`${API}/vault/add`, {
-      method: "POST",
-      body: form,
-    });
-
-    loadFiles();
+    await uploadSelectedPath(path);
   }
 
-  async function restoreFile(id) {
-    await fetch(`${API}/vault/restore/${id}`, { method: "POST" });
-    loadFiles();
+  function handleDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    setIsDragging(true);
   }
 
-  async function deleteFile(id) {
-    await fetch(`${API}/vault/delete/${id}`, { method: "POST" });
-    loadFiles();
+  function handleDragLeave(event) {
+    if (event.currentTarget === event.target) {
+      setIsDragging(false);
+    }
   }
 
-  function lockVault() {
-    setUnlocked(false);
-    setPassword("");
-    setFiles([]);
+  async function handleDrop(event) {
+    event.preventDefault();
+    setIsDragging(false);
+
+    const droppedPaths = Array.from(event.dataTransfer?.files || [])
+      .map((file) => window.electronAPI?.getPathForFile?.(file) || file.path)
+      .filter(Boolean);
+
+    if (droppedPaths.length === 0) {
+      setError("Drop a file from your computer to add it to the vault.");
+      return;
+    }
+
+    try {
+      setError("");
+      setLoading(true);
+      for (const path of droppedPaths) {
+        await uploadFile(path);
+      }
+      await refreshFiles();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  // 🔐 LOGIN SCREEN
-  if (!unlocked) {
+  async function handleOpenFile(name) {
+    const res = await window.electronAPI.openFile(name);
+    if (res && !res.success) {
+      alert("Error: " + res.error);
+    }
+  }
+
+  async function handleRestore(name) {
+    try {
+      setError("");
+      await restoreFile(name);
+      await refreshFiles();
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  async function handleDelete(name) {
+    if (!confirm("Delete permanently?")) return;
+
+    try {
+      setError("");
+      await removeFile(name);
+      await refreshFiles();
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  async function handleGenerateRecoveryKey() {
+    try {
+      setError("");
+      const data = await generateRecoveryKey();
+      setRecoveryKey(data.recovery_key);
+      await refreshRecoveryStatus();
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  async function handleSetPassword() {
+    try {
+      setError("");
+      await setVaultPassword(newPassword);
+      setSecret(newPassword);
+      setLoginMode("password");
+      setNewPassword("");
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  async function handleCopyRecoveryKey() {
+    if (!recoveryKey) return;
+
+    try {
+      if (window.electronAPI?.copyText) {
+        await window.electronAPI.copyText(recoveryKey);
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(recoveryKey);
+      } else {
+        throw new Error("Clipboard unavailable");
+      }
+      setCopiedRecovery(true);
+      window.setTimeout(() => setCopiedRecovery(false), 1600);
+    } catch (e) {
+      setError("Failed to copy recovery key.");
+    }
+  }
+
+  async function lockVault() {
+    try {
+      setError("");
+      await closeVault(loginMode === "password" ? secret : "");
+      setUnlocked(false);
+      setSecret("");
+      setFiles([]);
+      setRecoveryKey("");
+      setRecoveryStatus({ configured: false, pending: false });
+      setNewPassword("");
+      setLoginMode("password");
+      setGroupByCategory(false);
+      setActiveView("overview");
+      setOpenedCategory("");
+      setCopiedRecovery(false);
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  const canGenerateRecovery = !recoveryStatus.configured && !recoveryKey;
+  const normalizedFiles = files.map((file) => ({
+    ...file,
+    category: inferCategory(file.name),
+  }));
+
+  const groupedFiles = normalizedFiles.reduce((groups, file) => {
+    const category = file.category;
+    if (!groups[category]) {
+      groups[category] = [];
+    }
+    groups[category].push(file);
+    return groups;
+  }, {});
+
+  function renderFileRow(file) {
     return (
-      <div className="screen center">
-        <div className="card">
-          <img src={vault} width="100" style={{ marginBottom: "10px" }} />
-          <h1>Encrypted Vault</h1>
-
-          <input
-            type="password"
-            placeholder="Vault password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <button onClick={unlockVault} disabled={loading}>
-            {loading ? "Unlocking..." : "Unlock"}
-          </button>
-
-          {error && <p className="error">{error}</p>}
+      <div className="file-card modern" key={file.name}>
+        <button className="file-main" onClick={() => handleOpenFile(file.name)}>
+          <div>
+            <div className="file-name">{file.name}</div>
+          </div>
+        </button>
+        <div className="file-meta">
+          <span className="category-badge">{file.category}</span>
+          <div className="actions">
+            <button className="ghost" onClick={() => handleRestore(file.name)}>
+              Restore
+            </button>
+            <button className="ghost danger" onClick={() => handleDelete(file.name)}>
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // 📁 VAULT DASHBOARD
-  return (
-    <div className="screen">
-      <header>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <img src={vault} width="40" />
-          <h2>Vault Dashboard</h2>
+  function renderCategoryFolder(category, grouped) {
+    return (
+      <button
+        className="category-folder"
+        key={category}
+        onClick={() => setOpenedCategory(category)}
+      >
+        <div className="category-folder-top">
+          <div>
+            <p className="eyebrow">Category</p>
+            <h4>{category}</h4>
+          </div>
+          <span>{grouped.length} items</span>
         </div>
+      </button>
+    );
+  }
 
-        <button className="danger" onClick={lockVault}>
-          Lock Vault
-        </button>
-      </header>
+  function renderPromoPanel() {
+    if (!isOnline || promos.length === 0) {
+      return null;
+    }
 
-      <div className="toolbar">
-        <label className="file-btn">
-          ➕ Add File
-          <input type="file" hidden onChange={addFile} />
-        </label>
-      </div>
+    return (
+      <aside className="promo-panel">
+        <div className="promo-panel-header">
+          <div>
+            <p className="eyebrow">Updates</p>
+            <h3>From the publisher</h3>
+          </div>
+          <span className="status-pill neutral">Online</span>
+        </div>
+          <div className="promo-list">
+            {promos.map((promo) => (
+            <article className="promo-card" key={promo.id || promo.title}>
+              {promo.imageUrl && (
+                <div className="promo-media">
+                  <img src={promo.imageUrl} alt={promo.title || promo.label || "Promo banner"} />
+                </div>
+              )}
+              {!promo.imageUrl && promo.videoUrl && (
+                <div className="promo-media">
+                  <video
+                    src={promo.videoUrl}
+                    poster={promo.posterUrl}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    controls={Boolean(promo.showControls)}
+                  />
+                </div>
+              )}
+              <span className="promo-label">{promo.label || "Update"}</span>
+              <h4>{promo.title}</h4>
+              <p>{promo.body}</p>
+              {promo.url && (
+                <a
+                  className="promo-link"
+                  href={promo.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {promo.cta || "Open"}
+                </a>
+              )}
+            </article>
+          ))}
+        </div>
+      </aside>
+    );
+  }
 
-      <div className="file-list">
-        {files.length === 0 && <p className="muted">Vault is empty</p>}
-
-        {files.map((f) => (
-          <div className="file-card" key={f.id}>
-            <span>{f.name}</span>
-            <div className="actions">
-              <button onClick={() => restoreFile(f.id)}>Restore</button>
-              <button className="danger" onClick={() => deleteFile(f.id)}>
-                Delete
-              </button>
+  if (!unlocked) {
+    return (
+      <div className="auth-shell">
+        <div className="auth-panel">
+          <div className="brand-lockup">
+            <div className="brand-icon-wrap">
+              <img src={vaultImg} width="72" alt="vault" />
+            </div>
+            <div>
+              <p className="eyebrow">Encrypted Vault</p>
+              <h1>Secure Local Storage</h1>
+              <p className="auth-copy">Unlock your vault with a password or your recovery key.</p>
             </div>
           </div>
-        ))}
+          <div className="auth-toggle">
+            <button
+              className={loginMode === "password" ? "tab active" : "tab"}
+              onClick={() => setLoginMode("password")}
+              disabled={loginMode === "password"}
+            >
+              Password
+            </button>
+            <button
+              className={loginMode === "recovery" ? "tab active" : "tab"}
+              onClick={() => setLoginMode("recovery")}
+              disabled={loginMode === "recovery"}
+            >
+              Recovery Key
+            </button>
+          </div>
+          <label className="field-label" htmlFor="vault-secret">
+            {loginMode === "password" ? "Vault Password" : "Recovery Key"}
+          </label>
+          <input
+            id="vault-secret"
+            type={loginMode === "password" ? "password" : "text"}
+            placeholder={loginMode === "password" ? "Enter password" : "Enter recovery key"}
+            value={secret}
+            onChange={(e) => setSecret(e.target.value)}
+          />
+          <button className="primary-action" onClick={unlockVault} disabled={loading || !secret.trim()}>
+            {loading ? "Unlocking..." : "Unlock Vault"}
+          </button>
+          {error && <p className="error auth-error">{error}</p>}
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="app-shell">
+      <div className="app-backdrop" />
+      <header className="app-header">
+        <div className="brand-lockup compact">
+          <div className="brand-icon-wrap small">
+            <img src={vaultImg} width="38" alt="vault" />
+          </div>
+          <div>
+            <p className="eyebrow">Encrypted Vault</p>
+            <h2>Vault Dashboard</h2>
+          </div>
+        </div>
+        <div className="header-actions">
+          {canGenerateRecovery ? (
+            <button className="secondary-action header-action" onClick={handleGenerateRecoveryKey}>
+              Recovery Key
+            </button>
+          ) : (
+            <div className="recovery-inline">
+              <span className={recoveryStatus.configured ? "status-pill ready" : "status-pill pending"}>
+                {recoveryStatus.configured ? "Recovery Ready" : "Recovery Pending"}
+              </span>
+              {recoveryKey && (
+                <>
+                  <code>{recoveryKey}</code>
+                  <button className="icon-button" onClick={handleCopyRecoveryKey} title="Copy recovery key">
+                    <span className="copy-icon" aria-hidden="true" />
+                    <span>{copiedRecovery ? "Copied" : "Copy"}</span>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+          <button className="danger" onClick={lockVault}>
+            Lock Vault
+          </button>
+        </div>
+      </header>
+
+      <main className="dashboard-grid">
+        {error && <div className="status-banner error">{error}</div>}
+
+        <section className="view-switcher">
+          <button
+            className={activeView === "overview" ? "toggle-chip active" : "toggle-chip"}
+            onClick={() => setActiveView("overview")}
+          >
+            Overview
+          </button>
+          <button
+            className={activeView === "files" ? "toggle-chip active" : "toggle-chip"}
+            onClick={() => setActiveView("files")}
+          >
+            Files
+          </button>
+        </section>
+
+        {activeView === "overview" ? (
+          <div className="overview-grid">
+            <section
+              className={isDragging ? "overview-layout overview-layout-active" : "overview-layout"}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <button
+                className={isDragging ? "hero-card dropzone overview-dropzone overview-tap-target active" : "hero-card dropzone overview-dropzone overview-tap-target"}
+                onClick={handleAddFile}
+                disabled={loading}
+                type="button"
+              >
+                <div>
+                  <p className="eyebrow">Vault Actions</p>
+                  <h3>{isDragging ? "Drop files anywhere here" : loading ? "Adding files..." : "Tap or drag files here"}</h3>
+                </div>
+              </button>
+
+              {recoveryKey && (
+                <section className="recovery-card">
+                  <div className="recovery-key-box compact">
+                    <div>
+                      <strong>Recovery key created</strong>
+                      <span>This is only shown in this session.</span>
+                    </div>
+                    <p>{recoveryKey}</p>
+                  </div>
+                </section>
+              )}
+
+              {loginMode === "recovery" && (
+                <section className="recovery-card">
+                  <div className="password-reset-box">
+                    <div>
+                      <strong>Reset Password</strong>
+                      <p className="muted">You unlocked with the recovery key. Set a new password before relocking the vault.</p>
+                    </div>
+                    <div className="password-reset-actions">
+                      <input
+                        type="password"
+                        placeholder="New password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                      />
+                      <button className="secondary-action" onClick={handleSetPassword} disabled={!newPassword.trim()}>
+                        Save New Password
+                      </button>
+                    </div>
+                  </div>
+                </section>
+              )}
+            </section>
+
+            {renderPromoPanel()}
+          </div>
+        ) : (
+          <section className="files-card">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">Files</p>
+                  <h3>Vault Contents</h3>
+                </div>
+                <div className="view-toggle">
+                  <button
+                    className={groupByCategory ? "toggle-chip" : "toggle-chip active"}
+                    onClick={() => {
+                      setGroupByCategory(false);
+                      setOpenedCategory("");
+                    }}
+                  >
+                    All Files
+                  </button>
+                  <button
+                    className={groupByCategory ? "toggle-chip active" : "toggle-chip"}
+                    onClick={() => {
+                      setGroupByCategory(true);
+                      setOpenedCategory("");
+                    }}
+                  >
+                    Category View
+                  </button>
+                </div>
+              </div>
+
+              {files.length === 0 ? (
+                <div className="empty-state">
+                  <p>Vault is empty</p>
+                  <span>Add a file to begin securing your documents.</span>
+                </div>
+              ) : groupByCategory ? (
+                openedCategory ? (
+                  <div className="category-open-view">
+                    <div className="category-open-header">
+                      <button className="ghost folder-back" onClick={() => setOpenedCategory("")}>
+                        Back to Categories
+                      </button>
+                      <div>
+                        <p className="eyebrow">Folder</p>
+                        <h3>{openedCategory}</h3>
+                      </div>
+                    </div>
+                    <div className="file-list modern">
+                      {(groupedFiles[openedCategory] || []).map((file) => renderFileRow(file))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="category-groups">
+                    {Object.entries(groupedFiles).map(([category, grouped]) =>
+                      renderCategoryFolder(category, grouped)
+                    )}
+                  </div>
+                )
+              ) : (
+                <div className="file-list modern">
+                  {normalizedFiles.map((file) => renderFileRow(file))}
+                </div>
+              )}
+            </section>
+        )}
+      </main>
     </div>
   );
 }

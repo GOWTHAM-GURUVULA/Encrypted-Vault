@@ -8,17 +8,17 @@ export default function FileList({ isOpen }) {
     if (!isOpen) return;
 
     getFiles()
-      .then((data) => setFiles(data.files || []))
+      .then((data) => setFiles(data))
       .catch(console.error);
   }, [isOpen]);
 
   return (
     <ul>
-      {files.map((f) => (
-        <li key={f}>
-          {f}
-          <button onClick={() => removeFile(f)}>❌</button>
-          <button onClick={() => restoreFile(f)}>Restore</button>
+      {files.map((file) => (
+        <li key={file.name}>
+          {file.name}
+          <button onClick={() => removeFile(file.name)}>X</button>
+          <button onClick={() => restoreFile(file.name)}>Restore</button>
         </li>
       ))}
     </ul>

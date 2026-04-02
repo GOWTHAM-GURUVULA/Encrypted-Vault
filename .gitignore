@@ -10,8 +10,15 @@ __pycache__/
 # ======================
 build/
 dist/
+release/
 *.spec
 *.exe
+*.blockmap
+frontend/vaultui/dist/
+frontend/vaultui/release/
+frontend/vaultui/node_modules/
+backend/build/
+backend/dist/
 
 # ======================
 # Vault data (CRITICAL: NEVER COMMIT)
@@ -22,6 +29,13 @@ vault_plain/
 container_vault/
 *.vault
 *.vaultlock
+
+# ======================
+# Environment files
+# ======================
+.env
+.env.*
+!.env.example
 
 # ======================
 # OS / Editor

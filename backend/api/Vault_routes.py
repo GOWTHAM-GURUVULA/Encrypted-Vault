@@ -1,43 +1,60 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/vault", tags=["Vault"])
+from backend.vault.vault_service import (
+    open_vault,
+    close_vault,
+    add_file,
+    delete_file,
+    list_files,
+    restore_file
+)
 
-# -------------------------
-# In-memory vault state
-# -------------------------
-VAULT_PASSWORD = None
-vault_open = False
+router = APIRouter()
 
 
 class PasswordRequest(BaseModel):
     password: str
 
 
-@router.post("/init")
-def init_vault(data: PasswordRequest):
-    global VAULT_PASSWORD, vault_open
+class FileRequest(BaseModel):
+    path: str
 
-    VAULT_PASSWORD = data.password
-    vault_open = False
 
-    return {"message": "Vault password set successfully"}
+class FilenameRequest(BaseModel):
+    filename: str
 
 
 @router.post("/open")
-def open_vault(data: PasswordRequest):
-    global vault_open
-
-    if VAULT_PASSWORD is None:
-        raise HTTPException(status_code=400, detail="Vault not initialized")
-
-    if data.password != VAULT_PASSWORD:
-        raise HTTPException(status_code=401, detail="Invalid password")
-
-    vault_open = True
+def open_vault_route(data: PasswordRequest):
+    open_vault(data.password)
     return {"message": "Vault opened"}
 
 
-@router.get("/status")
-def vault_status():
-    return {"open": vault_open}
+@router.post("/close")
+def close_vault_route(data: PasswordRequest):
+    close_vault(data.password)
+    return {"message": "Vault closed"}
+
+
+@router.post("/add")
+def add_file_route(data: FileRequest):
+    add_file(data.path)
+    return {"message": "File added to vault"}
+
+
+@router.post("/delete")
+def delete_file_route(data: FilenameRequest):
+    delete_file(data.filename)
+    return {"message": "File deleted"}
+
+
+@router.get("/list")
+def list_files_route():
+    return {"files": list_files()}
+
+
+@router.post("/restore")
+def restore_file_route(data: FilenameRequest):
+    restore_file(data.filename)
+    return {"message": "File restored"}

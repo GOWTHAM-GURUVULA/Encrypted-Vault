@@ -1,11 +1,13 @@
-
 import { uploadFile } from "../api/vaultApi";
 
 export default function FileUpload() {
-  return (
-    <input
-      type="file"
-      onChange={(e) => uploadFile(e.target.files[0])}
-    />
-  );
+  async function handleChange(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    await uploadFile(file);
+    event.target.value = "";
+  }
+
+  return <input type="file" onChange={handleChange} />;
 }

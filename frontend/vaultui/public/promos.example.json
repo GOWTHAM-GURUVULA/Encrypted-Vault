@@ -1,0 +1,53 @@
+{
+  "items": [
+    {
+      "id": "photo-banner",
+      "label": "Upgrade",
+      "title": "Get Encrypted Vault Pro",
+      "body": "Unlock premium features, backup tools, and advanced recovery options.",
+      "imageUrl": "https://your-site.com/banners/pro-banner.jpg",
+      "cta": "Learn More",
+      "url": "https://your-site.com/pro"
+    },
+    {
+      "id": "video-banner",
+      "label": "New",
+      "title": "See the latest release",
+      "body": "Play a short muted promo or feature video inside the ad card.",
+      "videoUrl": "https://your-site.com/banners/release-video.mp4",
+      "posterUrl": "https://your-site.com/banners/release-poster.jpg",
+      "showControls": false,
+      "cta": "Watch More",
+      "url": "https://your-site.com/releases"
+    },
+    {
+      "id": "photo-banner-2",
+      "label": "Offer",
+      "title": "Launch week discount",
+      "body": "Offer a limited-time upgrade or seasonal promotion to your users.",
+      "imageUrl": "https://your-site.com/banners/offer-banner.jpg",
+      "cta": "View Offer",
+      "url": "https://your-site.com/offers"
+    },
+    {
+      "id": "video-banner-2",
+      "label": "Demo",
+      "title": "Watch a quick feature demo",
+      "body": "Show how folder view, recovery key, or upcoming premium tools work.",
+      "videoUrl": "https://your-site.com/banners/demo-video.mp4",
+      "posterUrl": "https://your-site.com/banners/demo-poster.jpg",
+      "showControls": false,
+      "cta": "See Demo",
+      "url": "https://your-site.com/demo"
+    },
+    {
+      "id": "support-banner",
+      "label": "Support",
+      "title": "Support Encrypted Vault",
+      "body": "Use this slot for donations, sponsorship, or community announcements.",
+      "imageUrl": "https://your-site.com/banners/support-banner.jpg",
+      "cta": "Support Now",
+      "url": "https://your-site.com/support"
+    }
+  ]
+}
