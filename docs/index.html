@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Encrypted Vault Promo Feed</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Segoe UI", system-ui, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at top left, rgba(79, 140, 255, 0.18), transparent 22%),
+          radial-gradient(circle at top right, rgba(29, 191, 115, 0.12), transparent 24%),
+          linear-gradient(180deg, #08111f 0%, #050b14 100%);
+        color: #f6f8fb;
+      }
+
+      main {
+        width: min(760px, calc(100% - 40px));
+        padding: 32px;
+        border-radius: 24px;
+        background: rgba(8, 18, 33, 0.88);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      a {
+        color: #8eb5ff;
+      }
+
+      code,
+      pre {
+        font-family: "Cascadia Code", "Consolas", monospace;
+      }
+
+      pre {
+        padding: 16px;
+        border-radius: 16px;
+        overflow: auto;
+        background: rgba(13, 22, 37, 0.92);
+        border: 1px solid rgba(148, 163, 184, 0.12);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Encrypted Vault Promo Feed</h1>
+      <p>This GitHub Pages site hosts the live promo feed for the Encrypted Vault desktop app.</p>
+      <p>Main feed URL: <a href="./promos.json">promos.json</a></p>
+      <p>Banner assets live under <code>/banners/</code>. Update <code>docs/promos.json</code> and commit changes to publish new ads.</p>
+      <pre>{
+  "items": [
+    {
+      "id": "promo-1",
+      "title": "Your live promo",
+      "imageUrl": "https://gowtham-guruvula.github.io/Encrypted-Vault/banners/pro-upgrade.svg"
+    }
+  ]
+}</pre>
+    </main>
+  </body>
+  </html>

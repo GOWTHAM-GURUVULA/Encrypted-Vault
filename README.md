@@ -38,6 +38,18 @@ The generated installer is written to `frontend/vaultui/release/`.
 - [Desktop README](frontend/vaultui/README.md)
 - [Privacy Policy](PRIVACY_POLICY.md)
 
+## GitHub Pages Promo Feed
+
+This repo is prepared to host live promo ads with GitHub Pages from the `docs/` folder.
+
+- feed file: `docs/promos.json`
+- landing page: `docs/index.html`
+- sample banner assets: `docs/banners/`
+
+Expected GitHub Pages URL for this repo:
+
+`https://gowtham-guruvula.github.io/Encrypted-Vault/promos.json`
+
 ## Publishing Notes
 
 - share the latest installer from `frontend/vaultui/release/`

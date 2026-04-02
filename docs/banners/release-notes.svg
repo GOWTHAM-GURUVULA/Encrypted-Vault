@@ -1,0 +1,22 @@
+<svg width="1200" height="628" viewBox="0 0 1200 628" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="70" y1="84" x2="1084" y2="542" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1DBF73"/>
+      <stop offset="1" stop-color="#1C8E5A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="628" rx="40" fill="#07111F"/>
+  <rect x="34" y="34" width="1132" height="560" rx="36" fill="url(#bg)"/>
+  <text x="92" y="162" fill="#DBFFF0" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="6">RELEASE</text>
+  <text x="92" y="244" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="62" font-weight="700">What is New in Encrypted Vault</text>
+  <text x="92" y="314" fill="#F1FFF8" font-family="Segoe UI, Arial, sans-serif" font-size="28">Promote new features, UI updates, walkthroughs, or launch notes.</text>
+  <rect x="92" y="386" width="226" height="62" rx="18" fill="#0E1B2D"/>
+  <text x="140" y="426" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">View Update</text>
+  <rect x="726" y="126" width="368" height="362" rx="34" fill="#08111F" fill-opacity="0.28"/>
+  <rect x="770" y="180" width="280" height="52" rx="16" fill="#FFFFFF" fill-opacity="0.18"/>
+  <rect x="770" y="258" width="280" height="52" rx="16" fill="#FFFFFF" fill-opacity="0.16"/>
+  <rect x="770" y="336" width="220" height="52" rx="16" fill="#FFFFFF" fill-opacity="0.14"/>
+  <circle cx="816" cy="206" r="10" fill="#FFFFFF"/>
+  <circle cx="816" cy="284" r="10" fill="#FFFFFF"/>
+  <circle cx="816" cy="362" r="10" fill="#FFFFFF"/>
+</svg>

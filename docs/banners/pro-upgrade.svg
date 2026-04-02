@@ -1,0 +1,22 @@
+<svg width="1200" height="628" viewBox="0 0 1200 628" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="92" y1="64" x2="1116" y2="564" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5EA2FF"/>
+      <stop offset="1" stop-color="#1C56D8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="628" rx="40" fill="#07111F"/>
+  <rect x="34" y="34" width="1132" height="560" rx="36" fill="url(#bg)"/>
+  <rect x="78" y="92" width="512" height="444" rx="30" fill="#08111F" fill-opacity="0.28"/>
+  <text x="92" y="162" fill="#DCE9FF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="6">UPGRADE</text>
+  <text x="92" y="248" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="64" font-weight="700">Encrypted Vault Pro</text>
+  <text x="92" y="320" fill="#EAF2FF" font-family="Segoe UI, Arial, sans-serif" font-size="28">Backups, advanced recovery, and premium vault tools.</text>
+  <rect x="92" y="390" width="218" height="62" rx="18" fill="#0E1B2D"/>
+  <text x="131" y="430" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">Learn More</text>
+  <rect x="760" y="132" width="258" height="314" rx="48" fill="#0E1B2D" fill-opacity="0.86"/>
+  <rect x="810" y="208" width="158" height="182" rx="34" fill="#132349"/>
+  <path d="M838 218C838 173.817 873.817 138 918 138C962.183 138 998 173.817 998 218V246H962V218C962 193.699 942.301 174 918 174C893.699 174 874 193.699 874 218V246H838V218Z" fill="#EEF5FF"/>
+  <path d="M884 276H952V332C952 350.778 936.778 366 918 366C899.222 366 884 350.778 884 332V276Z" fill="#5EA2FF"/>
+  <circle cx="918" cy="320" r="16" fill="#0E1B2D"/>
+  <path d="M918 336V352" stroke="#0E1B2D" stroke-width="10" stroke-linecap="round"/>
+</svg>

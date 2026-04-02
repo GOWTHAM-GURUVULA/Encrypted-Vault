@@ -1,0 +1,17 @@
+<svg width="1200" height="628" viewBox="0 0 1200 628" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="90" y1="78" x2="1098" y2="544" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF8A65"/>
+      <stop offset="1" stop-color="#E45757"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="628" rx="40" fill="#07111F"/>
+  <rect x="34" y="34" width="1132" height="560" rx="36" fill="url(#bg)"/>
+  <text x="92" y="162" fill="#FFF1EA" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="6">SUPPORT</text>
+  <text x="92" y="248" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="62" font-weight="700">Support Encrypted Vault</text>
+  <text x="92" y="320" fill="#FFF3EF" font-family="Segoe UI, Arial, sans-serif" font-size="28">Use this banner for donations, sponsors, or community updates.</text>
+  <rect x="92" y="388" width="220" height="62" rx="18" fill="#0E1B2D"/>
+  <text x="136" y="428" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700">Support Now</text>
+  <circle cx="920" cy="248" r="122" fill="#FFFFFF" fill-opacity="0.16"/>
+  <path d="M920 372C857.5 331 812 293 812 236C812 197 841 166 881 166C904 166 925 178 938 198C951 178 972 166 995 166C1035 166 1064 197 1064 236C1064 293 1018.5 331 956 372L938 384L920 372Z" fill="#FFFFFF"/>
+</svg>
