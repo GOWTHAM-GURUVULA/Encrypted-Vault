@@ -3,8 +3,13 @@ import shutil
 import zipfile
 import json
 import stat
-from security import crypto_core
+import threading
 from cryptography.exceptions import InvalidTag
+
+if __package__ and __package__.startswith("backend."):
+    from ..security import crypto_core
+else:
+    from security import crypto_core
 
 BASE_DIR = os.environ.get(
     "ENCRYPTED_VAULT_DATA_DIR",
@@ -52,6 +57,7 @@ class ContainerVault:
         self.master_key = None
         self.wrapped_keys = {}
         self.pending_recovery_key = None
+        self._operation_lock = threading.RLock()
 
     def open_vault(self, password: str):
         self._open_existing_vault(password, "password")
@@ -60,6 +66,10 @@ class ContainerVault:
         self._open_existing_vault(recovery_key, "recovery")
 
     def close_vault(self, password: str | None):
+        with self._operation_lock:
+            self._close_vault(password)
+
+    def _close_vault(self, password: str | None):
         if not self.is_open:
             raise Exception("Vault not open")
 
@@ -275,10 +285,11 @@ class ContainerVault:
         for name in os.listdir(VAULT_PLAIN):
             if name == INDEX_FILE:
                 continue
+            metadata = index.get(name, {})
             files.append(
                 {
                     "name": name,
-                    "category": infer_category(name),
+                    "category": normalize_category(metadata.get("category"), name),
                 }
             )
         return files
@@ -296,7 +307,9 @@ class ContainerVault:
         if not os.path.exists(vault_file):
             raise Exception("File missing from vault storage.")
 
-        os.makedirs(os.path.dirname(original_path), exist_ok=True)
+        parent_dir = os.path.dirname(original_path)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
         try:
             shutil.move(vault_file, original_path)
         except PermissionError as exc:

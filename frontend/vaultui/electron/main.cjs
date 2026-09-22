@@ -8,6 +8,7 @@ let win;
 let backendProcess;
 
 const DEV_SERVER_URL = "http://127.0.0.1:5173";
+const APP_USER_MODEL_ID = "com.encryptedsecurevault.app";
 
 function resolveProjectRoot() {
   return path.resolve(app.getAppPath(), "..", "..");
@@ -50,10 +51,15 @@ function migrateVaultDataIfNeeded(sourceDir, targetDir) {
 }
 
 function resolveVaultDataDir() {
-  const canonicalDataDir = path.join(app.getPath("appData"), "encrypted-vault", "vault-data");
-  const legacyDataDir = path.join(app.getPath("appData"), "EncryptedVault");
+  const canonicalDataDir = path.join(app.getPath("appData"), "encrypted-secure-vault", "vault-data");
+  const legacyDataDirs = [
+    path.join(app.getPath("appData"), "encrypted-vault"),
+    path.join(app.getPath("appData"), "EncryptedVault"),
+  ];
 
-  migrateVaultDataIfNeeded(legacyDataDir, canonicalDataDir);
+  for (const legacyDataDir of legacyDataDirs) {
+    migrateVaultDataIfNeeded(legacyDataDir, canonicalDataDir);
+  }
   fs.mkdirSync(canonicalDataDir, { recursive: true });
 
   return canonicalDataDir;
@@ -241,6 +247,7 @@ ipcMain.on("config:getApiBaseUrl", (event) => {
 });
 
 // App Lifecycle
+app.setAppUserModelId(APP_USER_MODEL_ID);
 app.whenReady().then(createWindow);
 
 app.on("window-all-closed", () => {

@@ -1,4 +1,7 @@
-from backend.vault.vault_fs import ContainerVault
+if __package__ and __package__.startswith("backend."):
+    from .vault_fs import ContainerVault
+else:
+    from vault.vault_fs import ContainerVault
 
 vault = ContainerVault()
 

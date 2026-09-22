@@ -1,6 +1,6 @@
-# Encrypted Vault
+# Encrypted Secure Vault
 
-Encrypted Vault is a Windows desktop app for storing files inside a local encrypted vault. The app uses an Electron + React frontend and a bundled Python backend.
+Encrypted Secure Vault is a Windows desktop app for storing files inside a local encrypted vault. The app uses an Electron + React frontend and a bundled Python backend.
 
 ## Features
 
@@ -55,3 +55,7 @@ Expected GitHub Pages URL for this repo:
 - share the latest installer from `frontend/vaultui/release/`
 - prefer signing the installer before public distribution
 - keep real `.env` values local and out of source control
+## password for cert 
+ 
+ - 1234
+ 

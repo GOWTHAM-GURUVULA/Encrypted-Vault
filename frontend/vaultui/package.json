@@ -1,9 +1,9 @@
 {
-  "name": "encrypted-vault",
-  "version": "1.2.7",
+  "name": "encrypted-secure-vault",
+  "version": "1.2.9",
   "description": "Secure local file encryption vault",
   "author": {
-    "name": "Gowtham"
+    "name": "GVK TECH DEVELOPERS"
   },
   "private": true,
   "main": "electron/main.cjs",
@@ -12,7 +12,8 @@
     "electron": "cmd /c \"set ELECTRON_RUN_AS_NODE=&& electron .\"",
     "electron:dev": "concurrently \"vite\" \"cmd /c \\\"set ELECTRON_RUN_AS_NODE=&& electron .\\\"\"",
     "build": "vite build",
-    "electron:build": "npm run build && electron-builder",
+    "backend:build": "powershell -ExecutionPolicy Bypass -File .\\scripts\\build-backend.ps1",
+    "electron:build": "npm run build && node .\\scripts\\check-release-inputs.cjs && electron-builder",
     "electron:sign": "powershell -ExecutionPolicy Bypass -File .\\scripts\\sign-installer.ps1",
     "electron:release:signed": "npm run electron:build && npm run electron:sign"
   },
@@ -28,8 +29,8 @@
     "vite": "^8.0.1"
   },
   "build": {
-    "appId": "com.encryptedvault.app",
-    "productName": "Encrypted Vault",
+    "appId": "com.encryptedsecurevault.app",
+    "productName": "Encrypted Secure Vault",
     "asar": true,
     "compression": "maximum",
     "electronDist": "node_modules/electron/dist",
@@ -55,6 +56,12 @@
     "win": {
       "icon": "electron/vault.ico",
       "target": "nsis"
+    },
+    "nsis": {
+      "include": "electron/installer.nsh",
+      "installerIcon": "electron/vault.ico",
+      "uninstallerIcon": "electron/vault.ico",
+      "installerHeaderIcon": "electron/vault.ico"
     }
   }
 }

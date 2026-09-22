@@ -49,7 +49,7 @@ Assert-FileExists -Path $MetadataPath -Label "Trusted Signing metadata file"
 Assert-FileExists -Path $ReleaseDir -Label "Release directory"
 
 $releaseRoot = (Resolve-Path -LiteralPath $ReleaseDir).Path
-$installer = Get-ChildItem -LiteralPath $releaseRoot -Filter "Encrypted Vault Setup *.exe" |
+$installer = Get-ChildItem -LiteralPath $releaseRoot -Filter "Encrypted Secure Vault Setup *.exe" |
     Where-Object { $_.Name -notlike "*__uninstaller*" } |
     Sort-Object LastWriteTime -Descending |
     Select-Object -First 1
@@ -60,7 +60,7 @@ if (-not $installer) {
 
 $artifacts = @($installer.FullName)
 
-$appExe = Join-Path $releaseRoot "win-unpacked\\Encrypted Vault.exe"
+$appExe = Join-Path $releaseRoot "win-unpacked\\Encrypted Secure Vault.exe"
 if (Test-Path -LiteralPath $appExe) {
     $artifacts += $appExe
 }

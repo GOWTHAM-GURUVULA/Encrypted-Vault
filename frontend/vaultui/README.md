@@ -1,6 +1,6 @@
-# Encrypted Vault Desktop
+# Encrypted Secure Vault Desktop
 
-Electron + React desktop client for the Encrypted Vault app.
+Electron + React desktop client for the Encrypted Secure Vault app.
 
 ## Development
 
@@ -37,7 +37,7 @@ Expected feed format:
     {
       "id": "pro",
       "label": "Upgrade",
-      "title": "Get Encrypted Vault Pro",
+      "title": "Get Encrypted Secure Vault Pro",
       "body": "Unlock premium features and advanced recovery tools.",
       "cta": "Learn More",
       "url": "https://your-site.com/pro"
@@ -58,12 +58,19 @@ Behavior:
 To create the normal Windows installer:
 
 ```powershell
+npm run backend:build
 npm run electron:build
 ```
 
 Output files are written to:
 
 `release/`
+
+`npm run electron:build` validates required release inputs before packaging:
+- `backend/dist/app.exe`
+- `electron/vault.ico`
+
+If either file is missing, build stops with a clear error instead of creating a broken installer.
 
 ## Trusted Signing Release
 
@@ -100,9 +107,9 @@ $env:TRUSTED_SIGNING_TIMESTAMP_URL="http://timestamp.acs.microsoft.com"
 
 The signing script:
 
-- finds the latest `Encrypted Vault Setup *.exe`
+- finds the latest `Encrypted Secure Vault Setup *.exe`
 - signs that installer
-- also signs `release\win-unpacked\Encrypted Vault.exe` when present
+- also signs `release\win-unpacked\Encrypted Secure Vault.exe` when present
 
 ## Recommended Release Flow
 
@@ -126,3 +133,4 @@ npm run electron:sign
 - Trusted Signing metadata is managed outside this repo.
 - If Windows blocks old builds, always use the latest signed installer.
 - Keep version numbers in `package.json` in sync with the installer you share.
+- The installer includes uninstall cleanup for `%APPDATA%\encrypted-vault` and legacy vault app-data folders.

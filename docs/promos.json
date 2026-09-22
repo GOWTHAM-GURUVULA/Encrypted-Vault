@@ -3,7 +3,7 @@
     {
       "id": "pro-upgrade",
       "label": "Upgrade",
-      "title": "Get Encrypted Vault Pro",
+      "title": "Get Encrypted Secure Vault Pro",
       "body": "Unlock premium backup tools, advanced recovery, and more vault features.",
       "imageUrl": "https://gowtham-guruvula.github.io/Encrypted-Vault/banners/pro-upgrade.svg",
       "cta": "Learn More",
@@ -12,7 +12,7 @@
     {
       "id": "release-update",
       "label": "Release",
-      "title": "See what is new in Encrypted Vault",
+      "title": "See what is new in Encrypted Secure Vault",
       "body": "Use this slot for release highlights, tutorials, or launch updates.",
       "imageUrl": "https://gowtham-guruvula.github.io/Encrypted-Vault/banners/release-notes.svg",
       "cta": "View Update",

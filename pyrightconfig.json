@@ -1,0 +1,11 @@
+{
+  "include": [
+    "backend"
+  ],
+  "extraPaths": [
+    "backend"
+  ],
+  "venvPath": ".",
+  "reportMissingImports": "warning",
+  "reportMissingModuleSource": "warning"
+}

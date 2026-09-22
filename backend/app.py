@@ -1,9 +1,13 @@
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from vault.vault_fs import ContainerVault
 import uvicorn
 import os
+
+if __package__ == "backend":
+    from .vault.vault_fs import ContainerVault
+else:
+    from vault.vault_fs import ContainerVault
 
 app = FastAPI()
 

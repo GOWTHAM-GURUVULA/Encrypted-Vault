@@ -1,14 +1,34 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from backend.vault.vault_service import (
-    open_vault,
-    close_vault,
-    add_file,
-    delete_file,
-    list_files,
-    restore_file
-)
+try:
+    if __package__ and __package__.startswith("backend."):
+        from ..vault.vault_service import (
+            open_vault,
+            close_vault,
+            add_file,
+            delete_file,
+            list_files,
+            restore_file,
+        )
+    else:
+        from vault.vault_service import (
+            open_vault,
+            close_vault,
+            add_file,
+            delete_file,
+            list_files,
+            restore_file,
+        )
+except ImportError:
+    from backend.vault.vault_service import (
+        open_vault,
+        close_vault,
+        add_file,
+        delete_file,
+        list_files,
+        restore_file,
+    )
 
 router = APIRouter()
 

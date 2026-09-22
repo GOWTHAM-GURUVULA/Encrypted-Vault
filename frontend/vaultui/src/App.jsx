@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import vaultImg from "./assets/vault.svg";
+import vaultImg from "./assets/vault.png";
 import {
   closeVault,
   generateRecoveryKey,
@@ -14,7 +14,58 @@ import {
   uploadFile,
 } from "./api/vaultApi";
 
-const PROMO_FEED_URL = import.meta.env.VITE_PROMO_FEED_URL || "";
+const PROMO_FEED_URL = import.meta.env.VITE_PROMO_FEED_URL?.trim() || "";
+const BUNDLED_PROMOS = [
+  {
+    id: "photo-banner",
+    label: "Upgrade",
+    title: "Get Encrypted Vault Pro",
+    body: "Unlock premium features, backup tools, and advanced recovery options.",
+    imageUrl: "https://your-site.com/banners/pro-banner.jpg",
+    cta: "Learn More",
+    url: "https://your-site.com/pro",
+  },
+  {
+    id: "video-banner",
+    label: "New",
+    title: "See the latest release",
+    body: "Play a short muted promo or feature video inside the ad card.",
+    videoUrl: "https://your-site.com/banners/release-video.mp4",
+    posterUrl: "https://your-site.com/banners/release-poster.jpg",
+    showControls: false,
+    cta: "Watch More",
+    url: "https://your-site.com/releases",
+  },
+  {
+    id: "photo-banner-2",
+    label: "Offer",
+    title: "Launch week discount",
+    body: "Offer a limited-time upgrade or seasonal promotion to your users.",
+    imageUrl: "https://your-site.com/banners/offer-banner.jpg",
+    cta: "View Offer",
+    url: "https://your-site.com/offers",
+  },
+  {
+    id: "video-banner-2",
+    label: "Demo",
+    title: "Watch a quick feature demo",
+    body: "Show how folder view, recovery key, or upcoming premium tools work.",
+    videoUrl: "https://your-site.com/banners/demo-video.mp4",
+    posterUrl: "https://your-site.com/banners/demo-poster.jpg",
+    showControls: false,
+    cta: "See Demo",
+    url: "https://your-site.com/demo",
+  },
+  {
+    id: "support-banner",
+    label: "Support",
+    title: "Support Encrypted Vault",
+    body: "Use this slot for donations, sponsorship, or community announcements.",
+    imageUrl: "https://your-site.com/banners/support-banner.jpg",
+    cta: "Support Now",
+    url: "https://your-site.com/support",
+  },
+];
 
 function inferCategory(filename) {
   const extension = filename.split(".").pop()?.toLowerCase() || "";
@@ -112,11 +163,11 @@ export default function App() {
 
         const data = await res.json();
         if (!cancelled) {
-          setPromos(Array.isArray(data?.items) ? data.items : []);
+          setPromos(Array.isArray(data?.items) && data.items.length > 0 ? data.items : BUNDLED_PROMOS);
         }
       } catch {
         if (!cancelled) {
-          setPromos([]);
+          setPromos(BUNDLED_PROMOS);
         }
       }
     }
@@ -295,8 +346,11 @@ export default function App() {
   }
 
   async function lockVault() {
+    if (loading) return;
+
     try {
       setError("");
+      setLoading(true);
       await closeVault(loginMode === "password" ? secret : "");
       setUnlocked(false);
       setSecret("");
@@ -311,10 +365,11 @@ export default function App() {
       setCopiedRecovery(false);
     } catch (e) {
       setError(e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
-  const canGenerateRecovery = !recoveryStatus.configured && !recoveryKey;
   const normalizedFiles = files.map((file) => ({
     ...file,
     category: inferCategory(file.name),
@@ -434,7 +489,7 @@ export default function App() {
               <img src={vaultImg} width="72" alt="vault" />
             </div>
             <div>
-              <p className="eyebrow">Encrypted Vault</p>
+              <p className="eyebrow">Encrypted Secure Vault</p>
               <h1>Secure Local Storage</h1>
               <p className="auth-copy">Unlock your vault with a password or your recovery key.</p>
             </div>
@@ -483,33 +538,30 @@ export default function App() {
             <img src={vaultImg} width="38" alt="vault" />
           </div>
           <div>
-            <p className="eyebrow">Encrypted Vault</p>
+            <p className="eyebrow">Encrypted Secure Vault</p>
             <h2>Vault Dashboard</h2>
           </div>
         </div>
-        <div className="header-actions">
-          {canGenerateRecovery ? (
-            <button className="secondary-action header-action" onClick={handleGenerateRecoveryKey}>
-              Recovery Key
-            </button>
-          ) : (
-            <div className="recovery-inline">
-              <span className={recoveryStatus.configured ? "status-pill ready" : "status-pill pending"}>
-                {recoveryStatus.configured ? "Recovery Ready" : "Recovery Pending"}
-              </span>
-              {recoveryKey && (
-                <>
-                  <code>{recoveryKey}</code>
-                  <button className="icon-button" onClick={handleCopyRecoveryKey} title="Copy recovery key">
-                    <span className="copy-icon" aria-hidden="true" />
-                    <span>{copiedRecovery ? "Copied" : "Copy"}</span>
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-          <button className="danger" onClick={lockVault}>
-            Lock Vault
+        <div className="header-actions">          <div className="recovery-inline">
+            <span className={recoveryStatus.configured ? "status-pill ready" : "status-pill pending"}>
+              {recoveryStatus.configured ? "Recovery Ready" : "Recovery Pending"}
+            </span>
+            {recoveryKey ? (
+              <>
+                <code>{recoveryKey}</code>
+                <button className="icon-button" onClick={handleCopyRecoveryKey} title="Copy recovery key">
+                  <span className="copy-icon" aria-hidden="true" />
+                  <span>{copiedRecovery ? "Copied" : "Copy"}</span>
+                </button>
+              </>
+            ) : (
+              <button className="secondary-action header-action" onClick={handleGenerateRecoveryKey}>
+                Show Key
+              </button>
+            )}
+          </div>
+          <button className="danger" onClick={lockVault} disabled={loading}>
+            {loading ? "Locking..." : "Lock Vault"}
           </button>
         </div>
       </header>
