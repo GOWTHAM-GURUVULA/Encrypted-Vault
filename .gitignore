@@ -43,3 +43,4 @@ container_vault/
 .vscode/
 .DS_Store
 Thumbs.db
+.venv/ 
