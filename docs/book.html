@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cute Colour Animals — Get the Book</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:#f4f7fb;font-family:Segoe UI,Arial,sans-serif;color:#172033;display:flex;justify-content:center;align-items:center;padding:24px}
+  .card{width:min(920px,100%);background:#fff;border-radius:22px;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.12);display:grid;grid-template-columns:minmax(220px,360px) 1fr;gap:30px;align-items:center}
+  .cover{width:100%;border-radius:16px;display:block}
+  h1{font-size:clamp(28px,4vw,44px);line-height:1.1;margin:0 0 12px}
+  p{font-size:18px;line-height:1.55;color:#4b5563}
+  .detected{font-size:14px;color:#6b7280;margin-top:8px}
+  .primary,.market{display:inline-block;border:0;border-radius:11px;padding:12px 16px;text-decoration:none;font-weight:700;cursor:pointer}
+  .primary{background:#1f3b68;color:#fff}
+  .markets{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+  .market{background:#e8edf5;color:#172033;font-size:13px}
+  @media(max-width:700px){.card{grid-template-columns:1fr;padding:18px}}
+</style>
+</head>
+<body>
+<main class="card">
+  <img class="cover" src="banners/cute-colour-animals.jpg" alt="Cute Colour Animals coloring book cover">
+  <section>
+    <h1>Cute Colour Animals</h1>
+    <p><strong>A Fun Coloring Book for Kids</strong></p>
+    <p>23 cute animals to color. Perfect for kids ages 3–8.</p>
+
+    <a id="primary" class="primary" target="_blank" rel="noopener noreferrer">Get the Book</a>
+    <div id="detected" class="detected"></div>
+
+    <div class="markets" id="markets"></div>
+  </section>
+</main>
+
+<script>
+const asin = "B0HCCZ46VB";
+
+const stores = {
+  US: ["Amazon US", "https://www.amazon.com/dp/"],
+  UK: ["Amazon UK", "https://www.amazon.co.uk/dp/"],
+  DE: ["Amazon Germany", "https://www.amazon.de/dp/"],
+  FR: ["Amazon France", "https://www.amazon.fr/dp/"],
+  ES: ["Amazon Spain", "https://www.amazon.es/dp/"],
+  IT: ["Amazon Italy", "https://www.amazon.it/dp/"],
+  NL: ["Amazon Netherlands", "https://www.amazon.nl/dp/"],
+  PL: ["Amazon Poland", "https://www.amazon.pl/dp/"],
+  SE: ["Amazon Sweden", "https://www.amazon.se/dp/"],
+  BE: ["Amazon Belgium", "https://www.amazon.com.be/dp/"],
+  IE: ["Amazon Ireland", "https://www.amazon.ie/dp/"],
+  JP: ["Amazon Japan", "https://www.amazon.co.jp/dp/"],
+  CA: ["Amazon Canada", "https://www.amazon.ca/dp/"],
+  AU: ["Amazon Australia", "https://www.amazon.com.au/dp/"]
+};
+
+const countryMap = {
+  US:"US", GB:"UK", DE:"DE", FR:"FR", ES:"ES", IT:"IT", NL:"NL",
+  PL:"PL", SE:"SE", BE:"BE", IE:"IE", JP:"JP", CA:"CA", AU:"AU"
+};
+
+function detectCountry() {
+  const parts = (navigator.language || "").split("-");
+  const region = (parts[1] || "").toUpperCase();
+  return countryMap[region] || "US";
+}
+
+function amazonUrl(code) {
+  return stores[code][1] + asin;
+}
+
+const country = detectCountry();
+const primary = document.getElementById("primary");
+primary.href = amazonUrl(country);
+primary.textContent = "Get the Book — " + stores[country][0];
+
+document.getElementById("detected").textContent =
+  "Suggested marketplace: " + stores[country][0] +
+  " (based on your browser region).";
+
+const markets = document.getElementById("markets");
+
+Object.keys(stores).forEach(code => {
+  const a = document.createElement("a");
+  a.className = "market";
+  a.href = amazonUrl(code);
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.textContent = stores[code][0];
+  markets.appendChild(a);
+});
+</script>
+</body>
+</html>
