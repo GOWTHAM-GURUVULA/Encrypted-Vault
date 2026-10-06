@@ -1,6 +1,15 @@
 {
   "items": [
     {
+      "id": "kdp-book",
+      "label": "Book",
+      "title": "Cute Colour Animals: A Fun Coloring Book for Kids",
+      "body": "23 cute animals to color. A fun coloring book for kids ages 3\u20138.",
+      "imageUrl": "https://gowtham-guruvula.github.io/Encrypted-Vault/banners/cute-colour-animals.jpg",
+      "cta": "Get the Book",
+      "url": "https://gowtham-guruvula.github.io/Encrypted-Vault/book.html"
+    },
+   {
       "id": "pro-upgrade",
       "label": "Upgrade",
       "title": "Get Encrypted Secure Vault Pro",
